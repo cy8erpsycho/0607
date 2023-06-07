@@ -1,0 +1,121 @@
+/**
+	 * 상품 번호에 해당하는 상품을 저장소에서 찾아 반환한다.
+	 * 
+	 * @param no 상품 번호
+	 * @return 상품(product)
+	 * @throws com.swansea.exception.FindException 번호에 해당 상품이 없으면 "상품이 없습니다." 메시지를
+	 *                                             갖는 예외 발생
+	 */
+	public Product selectByProdNo(String no) throws FindException {
+		// 파일에서 prodNo이 겹치면 가져온다.
+		// 전체적으로 읽어야 겠다.
+		try {
+			dis = new DataInputStream(new FileInputStream(fileName));
+			while (true) {
+				String prodNo = dis.readUTF();
+				String prodName = dis.readUTF();
+				int prodPrice = dis.readInt();
+				if (prodNo.equals(no)) {
+					return new Product(prodNo, prodName, prodPrice);
+				}
+			}
+		} catch (IOException e) {
+			System.err.println("없는 상품입니다.");
+		} finally {
+			if (dis != null) {
+				try {
+					dis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return null;
+	}
+
+
+
+
+
+
+
+
+
+
+/**
+	 * 모든 상품을 검색하여 반환
+	 * 
+	 * @return 상품들
+	 * @throws FindException
+	 */
+	public List<Product> selectAll() throws FindException {
+		// 모든 상품 반환
+		List<Product> products = new ArrayList<>();
+		try {
+			dis = new DataInputStream(new FileInputStream(fileName));
+			while (true) {
+				String prodNo = dis.readUTF();
+				String prodName = dis.readUTF();
+				int prodPrice = dis.readInt();
+				products.add(new Product(prodNo, prodName, prodPrice));
+			}
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+
+		return products;
+	}
+
+
+
+
+
+
+
+
+
+
+
+/**
+	 * 단어를 포함한 이름을 갖는 상품들을 반환한다.
+	 * 
+	 * @param pName 상품 이름
+	 * @return 해당 상품
+	 * @throws FindException
+	 */
+	public List<Product> selectByProdName(String pName) throws FindException {
+		// no와 비슷하게 ? ..
+		List<Product> products = new ArrayList<>();
+
+		try {
+			dis = new DataInputStream(new FileInputStream(fileName));
+			while (true) {
+				if (!pName.isEmpty()) {
+					String prodNo = dis.readUTF();
+					String prodName = dis.readUTF();
+					int prodPrice = dis.readInt();
+					if (prodName.contains(pName)) {
+						products.add(new Product(prodNo, prodName, prodPrice));
+					}
+				} else {
+					throw new FindException();
+				}
+			}
+		} catch (FindException e) {
+			System.err.println("없는 상품입니다.");
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		}
+		return products;
+	}
+
+
+
+
+
+
+
+
+
+
